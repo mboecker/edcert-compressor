@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/zombiemuffin/edcert-compressor.svg?branch=master)](https://travis-ci.org/zombiemuffin/edcert-compressor)
+
 This is the compressor module for my crate "Edcert".
 Edcert is a digital signature crate for signing/verifying content based on cryptography.
 
