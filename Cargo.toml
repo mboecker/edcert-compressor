@@ -1,11 +1,11 @@
 [package]
-name = "edcert-compressor"
-version = "0.1.0"
+name = "edcert_compressor"
+version = "0.1.1"
 authors = [ "Marvin Böcker <marvin.boecker@udo.edu>" ]
 
 description = "A crate to compress/decompress Edcert certificates."
 repository = "https://github.com/zombiemuffin/edcert-compressor/"
-documentation = "https://zombiemuffin.github.io/edcert-compressor/edcert-compressor/"
+documentation = "https://docs.rombie.de/edcert_compressor"
 readme = "README.md"
 keywords = ["ed25519", "lzma", "json", "network", "edcert"]
 license = "MIT"
