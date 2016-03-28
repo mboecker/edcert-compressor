@@ -28,32 +28,63 @@ pub struct CertificateLoader;
 impl CertificateLoader {
     /// Saves this certificate into a folder: one file for the certificate and one file for the
     /// private key.
-    pub fn save(cert: &Certificate, folder: &str) {
-        use std::fs::File;
+    pub fn save_to_folder(cert: &Certificate, folder: &str) -> Result<(), &'static str> {
         use std::fs::DirBuilder;
         use std::fs::metadata;
-        use std::io::Write;
-
-        let folder: String = folder.to_string();
 
         if metadata(&folder).is_err() {
             DirBuilder::new().create(&folder).expect("Failed to create folder");
         }
 
         if cert.has_private_key() {
-            let mut private_keyfile: File = File::create(folder.clone() + "/private.key")
-                                                .expect("Failed to create private key file.");
-            let bytes: &[u8] = cert.get_private_key().unwrap();
-            private_keyfile.write_all(bytes).expect("Failed to write private key file.");
+            try!(CertificateLoader::save_private_key(cert, &format!("{}/private.key", &folder)));
         }
 
-        let folder: String = folder.to_string();
-        let mut certificate_file: File = File::create(folder + "/certificate.ec")
-                                             .expect("Failed to create certificate file.");
+        try!(CertificateLoader::save_to_file(cert, &format!("{}/certificate.ec", &folder)));
+
+        Ok(())
+    }
+
+    /// Reads a certificate from a folder like it has been saved with save_to_folder
+    pub fn load_from_folder(folder: &str) -> Result<Certificate, &'static str> {
+
+        let mut cert = try!(CertificateLoader::load_from_file(&format!("{}/certificate.ec", &folder)));
+        try!(CertificateLoader::load_private_key(&mut cert, &format!("{}/private.key", &folder)));
+        Ok(cert)
+
+    }
+
+    /// Saves the certificate in encoded form to a file
+    pub fn save_to_file(cert: &Certificate, filename: &str) -> Result<(), &'static str> {
+        use std::fs::File;
+        use std::io::Write;
+
+        let mut certificate_file: File = match File::create(filename) {
+            Ok(x) => x,
+            Err(_) => return Err("Failed to create certificate file"),
+        };
 
         let compressed = CertificateCompressor::encode(cert);
-        certificate_file.write(&*compressed)
-                        .expect("Failed to write certificate file.");
+        match certificate_file.write(&*compressed) {
+            Ok(_) => Ok(()),
+            Err(_) => Err("Failed to write certificate to File."),
+        }
+    }
+
+    /// Saves the private key to a file. Just the binary string.
+    pub fn save_private_key(cert: &Certificate, filename: &str) -> Result<(), &'static str> {
+        use std::fs::File;
+        use std::io::Write;
+
+        let mut private_keyfile: File = match File::create(&filename) {
+            Ok(x) => x,
+            Err(_) => return Err("Failed to create private key file."),
+        };
+        let bytes: &[u8] = cert.private_key().unwrap();
+        match private_keyfile.write_all(bytes) {
+            Ok(_) => Ok(()),
+            Err(_) => Err("Failed to write private key file."),
+        }
     }
 
     /// This method loads a certificate from a file.
@@ -112,9 +143,14 @@ fn test_save() {
 
     assert_eq!(true, cv.is_valid(&cert).is_ok());
 
-    CertificateLoader::save(&cert, &expires.to_rfc3339());
-    let mut cert = CertificateLoader::load_from_file(&format!("{}{}", &expires.to_rfc3339(), "/certificate.ec")).expect("Failed to load certificate from file");
-    CertificateLoader::load_private_key(&mut cert, &format!("{}{}", &expires.to_rfc3339(), "/private.key")).expect("Failed to load private key from file");
+    CertificateLoader::save_to_folder(&cert, &expires.to_rfc3339()).unwrap();
+    let mut cert = CertificateLoader::load_from_file(&format!("{}{}",
+                                                              &expires.to_rfc3339(),
+                                                              "/certificate.ec"))
+                       .expect("Failed to load certificate from file");
+    CertificateLoader::load_private_key(&mut cert,
+                                        &format!("{}{}", &expires.to_rfc3339(), "/private.key"))
+        .expect("Failed to load private key from file");
 
     assert_eq!(true, cv.is_valid(&cert).is_ok());
 }

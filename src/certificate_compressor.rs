@@ -27,7 +27,6 @@ use lzma;
 pub struct CertificateCompressor;
 
 impl CertificateCompressor {
-
     /// takes a json-encoded byte vector and tries to create a certificate from it.
     pub fn decode(compressed: &[u8]) -> Result<Certificate, &'static str> {
         use rustc_serialize::json;
