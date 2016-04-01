@@ -120,17 +120,40 @@ fn test_en_and_decoder() {
         "signature": null
     }"#).unwrap();
 
-    let mut bytes = CertificateCompressor::encode(&cert);
+    let bytes = CertificateCompressor::encode(&cert);
     assert_eq!(&bytes[0..3], "edc".as_bytes());
     assert_eq!(&bytes[3..6], CERTIFICATE_COMPRESSOR_FORMAT_VERSION);
 
     let cert2 = CertificateCompressor::decode(&bytes).unwrap();
 
     assert_eq!(cert, cert2);
+}
 
-    bytes[3] = 0;
-    bytes[4] = 1;
-    bytes[5] = 0;
+#[test]
+fn test_decode_no_version() {
+    use rustc_serialize::json;
+
+    let cert: Certificate = json::decode(r#"
+    {
+        "meta": {
+            "values": {}
+        },
+        "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+        "private_key": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "expires": "2020-01-01T00:00:00+00:00",
+        "signature": null
+    }"#).unwrap();
+
+    let mut bytes = CertificateCompressor::encode(&cert);
+
+    // these bytes are ASCII for "ert". They are used to simulate an older file format.
+    bytes[3] = 0x65;
+    bytes[4] = 0x72;
+    bytes[5] = 0x74;
+
+    let cert2 = CertificateCompressor::decode(&bytes).unwrap();
+
+    assert_eq!(cert, cert2);
 }
 
 #[test]
