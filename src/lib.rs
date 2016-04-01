@@ -25,6 +25,7 @@ extern crate time;
 extern crate lzma;
 extern crate rustc_serialize;
 extern crate edcert;
+extern crate semver;
 
 pub mod certificate_compressor;
 pub mod certificate_loader;

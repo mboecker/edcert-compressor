@@ -40,7 +40,7 @@ impl CertificateLoader {
             try!(CertificateLoader::save_private_key(cert, &format!("{}/private.key", &folder)));
         }
 
-        try!(CertificateLoader::save_to_file(cert, &format!("{}/certificate.ec", &folder)));
+        try!(CertificateLoader::save_to_file(cert, &format!("{}/certificate.edc", &folder)));
 
         Ok(())
     }
@@ -48,7 +48,8 @@ impl CertificateLoader {
     /// Reads a certificate from a folder like it has been saved with save_to_folder
     pub fn load_from_folder(folder: &str) -> Result<Certificate, &'static str> {
 
-        let mut cert = try!(CertificateLoader::load_from_file(&format!("{}/certificate.ec", &folder)));
+        let mut cert = try!(CertificateLoader::load_from_file(&format!("{}/certificate.edc",
+                                                                       &folder)));
         try!(CertificateLoader::load_private_key(&mut cert, &format!("{}/private.key", &folder)));
         Ok(cert)
 
@@ -146,7 +147,7 @@ fn test_save() {
     CertificateLoader::save_to_folder(&cert, &expires.to_rfc3339()).unwrap();
     let mut cert = CertificateLoader::load_from_file(&format!("{}{}",
                                                               &expires.to_rfc3339(),
-                                                              "/certificate.ec"))
+                                                              "/certificate.edc"))
                        .expect("Failed to load certificate from file");
     CertificateLoader::load_private_key(&mut cert,
                                         &format!("{}{}", &expires.to_rfc3339(), "/private.key"))

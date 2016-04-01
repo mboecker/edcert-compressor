@@ -1,6 +1,6 @@
 [package]
 name = "edcert-compressor"
-version = "1.0.1"
+version = "1.1.0"
 authors = [ "Marvin Böcker <marvin.boecker@udo.edu>" ]
 
 description = "A crate to compress/decompress Edcert certificates."
@@ -13,6 +13,7 @@ license = "MIT"
 [dependencies]
 time = "^0.1"
 chrono = "^0.2"
-edcert = "^6.0"
+edcert = "^6.1"
 rustc-serialize = "^0.3"
 rust-lzma = "^0.2"
+semver = "^0.2"
