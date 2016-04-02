@@ -33,7 +33,9 @@ impl CertificateLoader {
         use std::fs::metadata;
 
         if metadata(&folder).is_err() {
-            DirBuilder::new().create(&folder).expect("Failed to create folder");
+            if DirBuilder::new().create(&folder).is_err() {
+                return Err("Failed to create folder");
+            }
         }
 
         if cert.has_private_key() {
@@ -77,11 +79,16 @@ impl CertificateLoader {
         use std::fs::File;
         use std::io::Write;
 
+        let bytes: &[u8] = match cert.private_key() {
+            Some(x) => x,
+            None => return Err("The certificate has no private key."),
+        };
+
         let mut private_keyfile: File = match File::create(&filename) {
             Ok(x) => x,
             Err(_) => return Err("Failed to create private key file."),
         };
-        let bytes: &[u8] = cert.private_key().unwrap();
+
         match private_keyfile.write_all(bytes) {
             Ok(_) => Ok(()),
             Err(_) => Err("Failed to write private key file."),
@@ -94,10 +101,15 @@ impl CertificateLoader {
         use std::io::Read;
 
         let filename: String = filename.to_string();
-        let mut certificate_file: File = File::open(filename)
-                                             .expect("Failed to open certificate file.");
+        let mut certificate_file: File = match File::open(filename) {
+            Err(_) => return Err("Failed to open certificate file."),
+            Ok(x) => x,
+        };
         let mut compressed = Vec::new();
-        certificate_file.read_to_end(&mut compressed).expect("Failed to read certificate");
+        match certificate_file.read_to_end(&mut compressed) {
+            Err(_) => return Err("Failed to read certificate"),
+            _ => {}
+        };
         CertificateCompressor::decode(&*compressed)
     }
 
@@ -107,10 +119,15 @@ impl CertificateLoader {
         use std::io::Read;
 
         let filename: String = filename.to_string();
-        let mut private_key_file: File = File::open(filename)
-                                             .expect("Failed to open private kye file.");
+        let mut private_key_file: File = match File::open(filename) {
+            Err(_) => return Err("Failed to open private kye file."),
+            Ok(x) => x,
+        };
         let mut private_key = Vec::new();
-        private_key_file.read_to_end(&mut private_key).expect("Failed to read private key");
+        match private_key_file.read_to_end(&mut private_key) {
+            Err(_) => return Err("Failed to read private key"),
+            _ => {}
+        };
 
         cert.set_private_key(private_key);
 

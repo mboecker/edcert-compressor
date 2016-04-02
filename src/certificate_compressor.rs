@@ -204,7 +204,7 @@ fn test_decode_new_version() {
     version[1] = 0;
     version[2] = 0;
 
-    edcert::copy_bytes(&mut bytes[3..6],&version,0,0,3);
+    edcert::copy_bytes(&mut bytes[3..6], &version, 0, 0, 3);
 
     // this should panic, since version 0.1.0 is not semver-compatible to any current version
     CertificateCompressor::decode(&bytes).unwrap();
