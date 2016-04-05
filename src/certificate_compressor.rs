@@ -30,7 +30,7 @@ pub struct CertificateCompressor;
 
 impl CertificateCompressor {
     fn get_version_from_bytes(bytes: &[u8]) -> String {
-        if bytes == "ert".as_bytes() {
+        if bytes == b"ert" {
             "1.0.0".to_string()
         } else {
             let major = bytes[0];
@@ -55,7 +55,7 @@ impl CertificateCompressor {
         let mut bytes: Vec<u8> = Vec::new();
 
         // load slice into vector
-        bytes.extend(compressed);
+        bytes.extend_from_slice(compressed);
 
         // read version from the file format
         let version = CertificateCompressor::get_version_from_bytes(&bytes[3..6]);
@@ -97,7 +97,7 @@ impl CertificateCompressor {
 
         let jsoncode = json::encode(cert).expect("Failed to encode certificate");
         let mut compressed = lzma::compress(&jsoncode.as_bytes(), 6).expect("failed to compress");
-        let magic = "edc".as_bytes();
+        let magic = b"edc";
         let version = &CertificateCompressor::get_bytes_from_version()[..];
         edcert::copy_bytes(&mut compressed[0..6], magic, 0, 0, 3);
         edcert::copy_bytes(&mut compressed[3..6], version, 0, 0, 3);
@@ -121,7 +121,7 @@ fn test_en_and_decoder() {
     }"#).unwrap();
 
     let bytes = CertificateCompressor::encode(&cert);
-    assert_eq!(&bytes[0..3], "edc".as_bytes());
+    assert_eq!(&bytes[0..3], b"edc");
     assert_eq!(&bytes[3..6], CERTIFICATE_COMPRESSOR_FORMAT_VERSION);
 
     let cert2 = CertificateCompressor::decode(&bytes).unwrap();

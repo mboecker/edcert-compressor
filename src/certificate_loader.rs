@@ -32,10 +32,8 @@ impl CertificateLoader {
         use std::fs::DirBuilder;
         use std::fs::metadata;
 
-        if metadata(&folder).is_err() {
-            if DirBuilder::new().create(&folder).is_err() {
-                return Err("Failed to create folder");
-            }
+        if metadata(&folder).is_err() && DirBuilder::new().create(&folder).is_err() {
+            return Err("Failed to create folder");
         }
 
         if cert.has_private_key() {
@@ -106,10 +104,9 @@ impl CertificateLoader {
             Ok(x) => x,
         };
         let mut compressed = Vec::new();
-        match certificate_file.read_to_end(&mut compressed) {
-            Err(_) => return Err("Failed to read certificate"),
-            _ => {}
-        };
+        if let Err(_) = certificate_file.read_to_end(&mut compressed) {
+            return Err("Failed to read certificate");
+        }
         CertificateCompressor::decode(&*compressed)
     }
 
@@ -124,10 +121,9 @@ impl CertificateLoader {
             Ok(x) => x,
         };
         let mut private_key = Vec::new();
-        match private_key_file.read_to_end(&mut private_key) {
-            Err(_) => return Err("Failed to read private key"),
-            _ => {}
-        };
+        if let Err(_) = private_key_file.read_to_end(&mut private_key) {
+            return Err("Failed to read private key");
+        }
 
         cert.set_private_key(private_key);
 
