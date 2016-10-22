@@ -20,12 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//! This crate defines two structs: A `CertificateCompressor` which JSON-encodes a given
+//! certificate and then uses LZMA to compress it. It should have similar size to a custom
+//! binary encoder. The other defined struct is a `CertificateLoader`, which does the exact
+//! opposite.
+
+#![deny(missing_docs)]
+
 extern crate chrono;
-extern crate time;
 extern crate lzma;
 extern crate rustc_serialize;
 extern crate edcert;
 extern crate semver;
 
+/// This module contains the logic to save a certificate.
 pub mod certificate_compressor;
+
+/// This module contaisn the logic to load a certificate.
 pub mod certificate_loader;

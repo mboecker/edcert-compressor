@@ -23,6 +23,7 @@
 use edcert::certificate::Certificate;
 use certificate_compressor::CertificateCompressor;
 
+/// This type can be used to load `Certificate`s.
 pub struct CertificateLoader;
 
 impl CertificateLoader {
@@ -137,7 +138,7 @@ fn test_save() {
     use edcert::meta::Meta;
     use chrono::Timelike;
     use chrono::UTC;
-    use time::Duration;
+    use chrono::duration::Duration;
     use edcert::validator::Validator;
     use edcert::root_validator::RootValidator;
     use edcert::revoker::NoRevoker;

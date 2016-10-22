@@ -26,6 +26,7 @@ use lzma;
 
 static CERTIFICATE_COMPRESSOR_FORMAT_VERSION: [u8; 3] = [1, 1, 0];
 
+/// This type can be used to save `Certificate`s.
 pub struct CertificateCompressor;
 
 impl CertificateCompressor {
@@ -96,7 +97,7 @@ impl CertificateCompressor {
         use rustc_serialize::json;
 
         let jsoncode = json::encode(cert).expect("Failed to encode certificate");
-        let mut compressed = lzma::compress(&jsoncode.as_bytes(), 6).expect("failed to compress");
+        let mut compressed = lzma::compress(jsoncode.as_bytes(), 6).expect("failed to compress");
         let magic = b"edc";
         let version = &CertificateCompressor::get_bytes_from_version()[..];
         edcert::copy_bytes(&mut compressed[0..6], magic, 0, 0, 3);

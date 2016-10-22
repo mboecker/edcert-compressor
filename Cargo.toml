@@ -11,9 +11,8 @@ keywords = ["ed25519", "lzma", "json", "network", "edcert"]
 license = "MIT"
 
 [dependencies]
-time = "^0.1"
 chrono = "^0.2"
-edcert = "^8.0"
+edcert = "^9.0"
 rustc-serialize = "^0.3"
 rust-lzma = "^0.2"
-semver = "^0.2"
+semver = "^0.5.1"
